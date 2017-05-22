@@ -8,9 +8,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.widget.Toast;
 
 import com.udacity.stockhawk.data.Contract;
 import com.udacity.stockhawk.data.PrefUtils;
+import com.udacity.stockhawk.mock.MockUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,7 +33,7 @@ import yahoofinance.quotes.stock.StockQuote;
 public final class QuoteSyncJob {
 
     private static final int ONE_OFF_ID = 2;
-    private static final String ACTION_DATA_UPDATED = "com.udacity.stockhawk.ACTION_DATA_UPDATED";
+    public static final String ACTION_DATA_UPDATED = "com.udacity.stockhawk.ACTION_DATA_UPDATED";
     private static final int PERIOD = 300000;
     private static final int INITIAL_BACKOFF = 10000;
     private static final int PERIODIC_ID = 1;
@@ -75,34 +77,39 @@ public final class QuoteSyncJob {
                 Stock stock = quotes.get(symbol);
                 StockQuote quote = stock.getQuote();
 
-                float price = quote.getPrice().floatValue();
-                float change = quote.getChange().floatValue();
-                float percentChange = quote.getChangeInPercent().floatValue();
+                if (quote.getPrice() != null) {
+                    float price = quote.getPrice().floatValue();
+                    float change = quote.getChange().floatValue();
+                    float percentChange = quote.getChangeInPercent().floatValue();
 
-                // WARNING! Don't request historical data for a stock that doesn't exist!
-                // The request will hang forever X_x
-                List<HistoricalQuote> history = stock.getHistory(from, to, Interval.WEEKLY);
+                    //List<HistoricalQuote> history = stock.getHistory(from, to, Interval.WEEKLY);
 
-                StringBuilder historyBuilder = new StringBuilder();
+                    List<HistoricalQuote> history = MockUtils.getHistory();
+                    StringBuilder historyBuilder = new StringBuilder();
 
-                for (HistoricalQuote it : history) {
-                    historyBuilder.append(it.getDate().getTimeInMillis());
-                    historyBuilder.append(", ");
-                    historyBuilder.append(it.getClose());
-                    historyBuilder.append("\n");
+                    for (HistoricalQuote it : history) {
+                        historyBuilder.append(it.getDate().getTimeInMillis());
+                        historyBuilder.append(", ");
+                        historyBuilder.append(it.getClose());
+                        historyBuilder.append("\n");
+                    }
+
+                    ContentValues quoteCV = new ContentValues();
+                    quoteCV.put(Contract.Quote.COLUMN_SYMBOL, symbol);
+                    quoteCV.put(Contract.Quote.COLUMN_PRICE, price);
+                    quoteCV.put(Contract.Quote.COLUMN_PERCENTAGE_CHANGE, percentChange);
+                    quoteCV.put(Contract.Quote.COLUMN_ABSOLUTE_CHANGE, change);
+
+
+                    quoteCV.put(Contract.Quote.COLUMN_HISTORY, historyBuilder.toString());
+
+                    quoteCVs.add(quoteCV);
+
+                }else{
+                    PrefUtils.removeStock(context,quote.getSymbol());
+                    Toast t = Toast.makeText(context, "Stock doesn't exist", Toast.LENGTH_SHORT);
+                    t.show();
                 }
-
-                ContentValues quoteCV = new ContentValues();
-                quoteCV.put(Contract.Quote.COLUMN_SYMBOL, symbol);
-                quoteCV.put(Contract.Quote.COLUMN_PRICE, price);
-                quoteCV.put(Contract.Quote.COLUMN_PERCENTAGE_CHANGE, percentChange);
-                quoteCV.put(Contract.Quote.COLUMN_ABSOLUTE_CHANGE, change);
-
-
-                quoteCV.put(Contract.Quote.COLUMN_HISTORY, historyBuilder.toString());
-
-                quoteCVs.add(quoteCV);
-
             }
 
             context.getContentResolver()
