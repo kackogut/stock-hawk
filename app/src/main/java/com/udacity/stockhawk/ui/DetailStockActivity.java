@@ -88,6 +88,7 @@ public class DetailStockActivity extends AppCompatActivity{
                 mStockValueTV.setText(Float.toString(e.getY()));
                 String date = mStockValues.get(mSeclectedValue)[0];
                 mDateValueTV.setText(formatDate(date));
+
             }
 
             @Override
@@ -131,6 +132,8 @@ public class DetailStockActivity extends AppCompatActivity{
 
         mStockHistoryChart.setKeepPositionOnRotation(true);
         mStockHistoryChart.setDrawGridBackground(false);
+        mStockHistoryChart.setDescription(null);
+        mStockHistoryChart.getLegend().setEnabled(false);
     }
 
     @Override
@@ -142,8 +145,8 @@ public class DetailStockActivity extends AppCompatActivity{
             mDateValueTV.setText(formatDate(mStockValues.get(mSeclectedValue)[0]));
             mStockValueTV.setText(savedInstanceState.getString(SAVED_STATE_VALUE));
             mStockHistoryChart.highlightValue(mSeclectedValue,mSeclectedValue,true);
+            mStockHistoryChart.callOnClick();
             showTextViews(true);
-            //mStockHistoryChart.highlightValue(mSeclectedValue,mSeclectedValue);
         }
     }
 

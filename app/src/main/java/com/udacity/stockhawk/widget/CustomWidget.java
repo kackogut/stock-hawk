@@ -31,7 +31,7 @@ public class CustomWidget extends AppWidgetProvider {
 
             Intent intent = new Intent(context,MainActivity.class);
             PendingIntent pendingIntent = PendingIntent.getActivity(context,0,intent,0);
-            remoteViews.setOnClickPendingIntent(R.id.widget, pendingIntent);
+            remoteViews.setOnClickPendingIntent(R.id.widget_main_layout, pendingIntent);
 
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH){
                 setRemoteAdapter(context, remoteViews);
@@ -68,13 +68,6 @@ public class CustomWidget extends AppWidgetProvider {
             int[] appWidgetsIds = appWidgetManager.getAppWidgetIds(new ComponentName(context, getClass()));
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetsIds, R.id.widget_list_view);
         }
-    }
-    @Override
-    public void onEnabled(Context context) {
-    }
-
-    @Override
-    public void onDisabled(Context context) {
     }
 }
 

@@ -1,16 +1,16 @@
 <resources>
-    <string name="app_name">Stock Hawk</string>
+    <string name="app_name" translatable="false">Stock Hawk</string>
 
     <string name="pref_stocks_initialized_key" translatable="false">initialized</string>
 
-    <string name="pref_stocks_key">stocks</string>
+    <string name="pref_stocks_key" translatable="false">stocks</string>
 
 
-    <string name="pref_display_mode_key">displayMode</string>
-    <string name="pref_display_mode_default">@string/pref_display_mode_percentage_key</string>
+    <string name="pref_display_mode_key" translatable="false">displayMode</string>
+    <string name="pref_display_mode_default" translatable="false">@string/pref_display_mode_percentage_key</string>
 
-    <string name="pref_display_mode_absolute_key">absolute</string>
-    <string name="pref_display_mode_percentage_key">percentage</string>
+    <string name="pref_display_mode_absolute_key" translatable="false">absolute</string>
+    <string name="pref_display_mode_percentage_key" translatable="true">percentage</string>
 
     <string name="default_stocks_yahoo">YHOO</string>
     <string name="default_stocks_apple">AAPL</string>
@@ -21,17 +21,23 @@
     <string name="action_change_units">@string/pref_display_mode_key</string>
 
 
-    <string name="dialog_title">Add Stock</string>
-    <string name="dialog_hint">Symbol (e.g. GOOG)</string>
-    <string name="dialog_cancel">Cancel</string>
-    <string name="dialog_add">Add</string>
+    <string name="dialog_title" translatable="true">Add Stock</string>
+    <string name="dialog_hint" translatable="true">Symbol (e.g. GOOG)</string>
+    <string name="dialog_cancel" translatable="true">Cancel</string>
+    <string name="dialog_add" translatable="true">Add</string>
 
-    <string name="error_no_network">No network connectivity! Will load stock cursor when the network is available.</string>
-    <string name="error_no_stocks">No stocks added! Hit the floating action button to add one.</string>
+    <string name="error_no_network" translatable="true">No network connectivity! Will load stock cursor when the network is available.</string>
+    <string name="error_no_stocks" translatable="true">No stocks added! Hit the floating action button to add one.</string>
 
-    <string name="toast_stock_added_no_connectivity">Symbol %s added. Will refresh when network available.</string>
-    <string name="toast_no_connectivity">Will refresh when network available.</string>
-    <string name="appwidget_text">STOCK HAWK</string>
-    <string name="empty_view">Error</string>
+    <string name="toast_stock_added_no_connectivity" translatable="true">Symbol %s added. Will refresh when network available.</string>
+    <string name="toast_no_connectivity" translatable="true">Will refresh when network available.</string>
+    <string name="appwidget_text" translatable="false">STOCK HAWK</string>
+    <string name="empty_view" translatable="true">Error</string>
+
+    <!-- CONTENT DESCRIPTION !-->
+    <string name="add_stock_description" translatable="true">Add new stock</string>
+    <string name="change_display_type_description_absolute" translatable="true">Change display mode to percentage</string>
+    <string name="change_display_type_description_percentage" translatable="true">Change display mode to absolute</string>
+    <string name="stock_chart_description" translatable="true">Stock Chart</string>
 
 </resources>

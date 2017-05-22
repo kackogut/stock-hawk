@@ -19,10 +19,12 @@ import com.udacity.stockhawk.data.Contract;
 
 public class StockWidgetService extends RemoteViewsService {
 
+    private static final int INDEX_STOCK_ID = 0;
     private static final int INDEX_SYMBOL = 1;
     private static final int INDEX_PRICE = 2;
     private static final int INDEX_ABSOLUTE_CHANGE = 3;
     private static final int INDEX_PERCENTAGE_CHANGE = 4;
+
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
         return new RemoteViewsFactory() {
@@ -37,7 +39,7 @@ public class StockWidgetService extends RemoteViewsService {
             public void onDataSetChanged() {
                 if (mStockData != null)
                     mStockData.close();
-                final long pId = Binder.clearCallingIdentity();
+                final long binderID = Binder.clearCallingIdentity();
                 mStockData = getContentResolver().query(
                         Contract.Quote.URI,
                         new String[]{Contract.Quote._ID,
@@ -49,7 +51,7 @@ public class StockWidgetService extends RemoteViewsService {
                         null,
                         Contract.Quote.COLUMN_SYMBOL + " ASC"
                 );
-                Binder.restoreCallingIdentity(pId);
+                Binder.restoreCallingIdentity(binderID);
             }
 
             @Override
@@ -72,27 +74,22 @@ public class StockWidgetService extends RemoteViewsService {
                 if (AdapterView.INVALID_POSITION == position || mStockData == null || !mStockData.moveToPosition(position))
                     return null;
                 RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.widget_stock_item);
-                String symbol = mStockData.getString(INDEX_SYMBOL);
-                String price = "$"+mStockData.getString(INDEX_PRICE);
-                String change = "";
+                String stockSymbol = mStockData.getString(INDEX_SYMBOL);
+                String currentPrice = "$"+mStockData.getString(INDEX_PRICE);
+                String valueChange = "";
 
                 if (mStockData.getFloat(INDEX_ABSOLUTE_CHANGE) > 0) {
                     remoteViews.setTextColor(R.id.widget_percentage_change_tv, ContextCompat.getColor(getBaseContext(),R.color.material_green_700));
-                    change += "+";
+                    valueChange += "+";
                 } else {
                     remoteViews.setTextColor(R.id.widget_percentage_change_tv, ContextCompat.getColor(getBaseContext(),R.color.material_red_700));
-                    change += "-";
                 }
-                change+=mStockData.getString(INDEX_PERCENTAGE_CHANGE)+"%";
-                remoteViews.setTextViewText(R.id.symbol, symbol);
-                remoteViews.setTextViewText(R.id.price, price);
-                remoteViews.setTextViewText(R.id.widget_percentage_change_tv, change);
-
-                Bundle extras = new Bundle();
-                extras.putString("SYMBOL", symbol);
+                valueChange+=mStockData.getString(INDEX_PERCENTAGE_CHANGE)+"%";
+                remoteViews.setTextViewText(R.id.symbol, stockSymbol);
+                remoteViews.setTextViewText(R.id.price, currentPrice);
+                remoteViews.setTextViewText(R.id.widget_percentage_change_tv, valueChange);
 
                 Intent fillInIntent = new Intent();
-                fillInIntent.putExtras(extras);
                 remoteViews.setOnClickFillInIntent(R.id.list_item_ll, fillInIntent);
 
                 return remoteViews;
@@ -111,7 +108,7 @@ public class StockWidgetService extends RemoteViewsService {
             @Override
             public long getItemId(int position) {
                 if (mStockData.moveToPosition(position))
-                    return mStockData.getLong(0);
+                    return mStockData.getLong(INDEX_STOCK_ID);
                 return position;
             }
 

@@ -122,7 +122,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     void addStock(String symbol) {
         if (symbol != null && !symbol.isEmpty()) {
-
             if (networkUp()) {
                 swipeRefreshLayout.setRefreshing(true);
             } else {
@@ -165,8 +164,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if (PrefUtils.getDisplayMode(this)
                 .equals(getString(R.string.pref_display_mode_absolute_key))) {
             item.setIcon(R.drawable.ic_percentage);
+            item.setTitle(R.string.change_display_type_description_absolute);
         } else {
             item.setIcon(R.drawable.ic_dollar);
+            item.setTitle(R.string.change_display_type_description_percentage);
         }
     }
 
