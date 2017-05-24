@@ -66,7 +66,7 @@ public class CustomWidget extends AppWidgetProvider {
         if(QuoteSyncJob.ACTION_DATA_UPDATED.equals(intent.getAction())){
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
             int[] appWidgetsIds = appWidgetManager.getAppWidgetIds(new ComponentName(context, getClass()));
-            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetsIds, R.id.widget_list_view);
+            onUpdate(context, appWidgetManager, appWidgetsIds);
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.udacity.stockhawk.ui;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -24,6 +26,7 @@ import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
 import com.udacity.stockhawk.data.PrefUtils;
 import com.udacity.stockhawk.sync.QuoteSyncJob;
+import com.udacity.stockhawk.widget.CustomWidget;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -150,6 +153,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             error.setVisibility(View.GONE);
         }
         adapter.setCursor(data);
+        Intent intent = new Intent(this,CustomWidget.class);
+        int ids[] = AppWidgetManager.getInstance(this).getAppWidgetIds(new ComponentName(this, CustomWidget.class));
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,ids);
+        intent.setAction(QuoteSyncJob.ACTION_DATA_UPDATED);
+        this.sendBroadcast(intent);
     }
 
 

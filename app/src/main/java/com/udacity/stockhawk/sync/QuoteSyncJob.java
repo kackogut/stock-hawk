@@ -2,6 +2,7 @@ package com.udacity.stockhawk.sync;
 
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
+import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 import com.udacity.stockhawk.data.Contract;
 import com.udacity.stockhawk.data.PrefUtils;
 import com.udacity.stockhawk.mock.MockUtils;
+import com.udacity.stockhawk.widget.CustomWidget;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -75,41 +77,49 @@ public final class QuoteSyncJob {
 
 
                 Stock stock = quotes.get(symbol);
-                StockQuote quote = stock.getQuote();
+                StockQuote quote = null;
+                if(stock != null) {
+                    quote = stock.getQuote();
+                    if (quote.getPrice() != null) {
+                        float price = quote.getPrice().floatValue();
+                        float change = quote.getChange().floatValue();
+                        float percentChange = quote.getChangeInPercent().floatValue();
 
-                if (quote.getPrice() != null) {
-                    float price = quote.getPrice().floatValue();
-                    float change = quote.getChange().floatValue();
-                    float percentChange = quote.getChangeInPercent().floatValue();
+                        //List<HistoricalQuote> history = stock.getHistory(from, to, Interval.WEEKLY);
 
-                    //List<HistoricalQuote> history = stock.getHistory(from, to, Interval.WEEKLY);
+                        List<HistoricalQuote> history = MockUtils.getHistory();
+                        StringBuilder historyBuilder = new StringBuilder();
 
-                    List<HistoricalQuote> history = MockUtils.getHistory();
-                    StringBuilder historyBuilder = new StringBuilder();
+                        for (HistoricalQuote it : history) {
+                            historyBuilder.append(it.getDate().getTimeInMillis());
+                            historyBuilder.append(", ");
+                            historyBuilder.append(it.getClose());
+                            historyBuilder.append("\n");
+                        }
 
-                    for (HistoricalQuote it : history) {
-                        historyBuilder.append(it.getDate().getTimeInMillis());
-                        historyBuilder.append(", ");
-                        historyBuilder.append(it.getClose());
-                        historyBuilder.append("\n");
+                        ContentValues quoteCV = new ContentValues();
+                        quoteCV.put(Contract.Quote.COLUMN_SYMBOL, symbol);
+                        quoteCV.put(Contract.Quote.COLUMN_PRICE, price);
+                        quoteCV.put(Contract.Quote.COLUMN_PERCENTAGE_CHANGE, percentChange);
+                        quoteCV.put(Contract.Quote.COLUMN_ABSOLUTE_CHANGE, change);
+
+
+                        quoteCV.put(Contract.Quote.COLUMN_HISTORY, historyBuilder.toString());
+
+                        quoteCVs.add(quoteCV);
+
+                    } else {
+                        PrefUtils.removeStock(context, quote.getSymbol());
+
                     }
-
-                    ContentValues quoteCV = new ContentValues();
-                    quoteCV.put(Contract.Quote.COLUMN_SYMBOL, symbol);
-                    quoteCV.put(Contract.Quote.COLUMN_PRICE, price);
-                    quoteCV.put(Contract.Quote.COLUMN_PERCENTAGE_CHANGE, percentChange);
-                    quoteCV.put(Contract.Quote.COLUMN_ABSOLUTE_CHANGE, change);
-
-
-                    quoteCV.put(Contract.Quote.COLUMN_HISTORY, historyBuilder.toString());
-
-                    quoteCVs.add(quoteCV);
-
-                }else{
-                    PrefUtils.removeStock(context,quote.getSymbol());
-                    Toast t = Toast.makeText(context, "Stock doesn't exist", Toast.LENGTH_SHORT);
+                }
+                else{
+                    Toast t = Toast.makeText(context, "Invalid input", Toast.LENGTH_SHORT);
                     t.show();
                 }
+
+
+
             }
 
             context.getContentResolver()
@@ -120,8 +130,11 @@ public final class QuoteSyncJob {
             Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED);
             context.sendBroadcast(dataUpdatedIntent);
 
+
         } catch (IOException exception) {
             Timber.e(exception, "Error fetching stock quotes");
+            Toast t = Toast.makeText(context, "Stock doesn't exist", Toast.LENGTH_SHORT);
+            t.show();
         }
     }
 
